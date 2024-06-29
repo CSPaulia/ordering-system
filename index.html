@@ -10,12 +10,13 @@
         .dish-card { border: 1px solid #ddd; padding: 10px; margin: 10px; width: 200px; text-align: center; }
         .dish-image { width: 180px; height: 180px; object-fit: cover; }
         #order-list { margin-top: 20px; }
+        .category { margin-top: 20px; }
     </style>
 </head>
 <body>
     <h1>点餐系统</h1>
-    <div class="menu" id="menu">
-        <!-- 菜品卡片将在这里动态生成 -->
+    <div id="categories">
+        <!-- 菜品分类将在这里动态生成 -->
     </div>
     <div id="order-list">
         <h2>您的订单</h2>
@@ -25,26 +26,32 @@
     <a href="orders.html">查看所有订单</a>
 
     <script>
-        // 直接在代码中定义菜品
         const dishes = [
-            {name: "宫保鸡丁", price: 38, image: "GoT.png"},
-            {name: "鱼香肉丝", price: 32, image: "GoT.png"},
-            {name: "麻婆豆腐", price: 28, image: "GoT.png"},
+            {name: "宫保鸡丁", price: 38, image: "GoT.png", category: "主菜"},
+            {name: "鱼香肉丝", price: 32, image: "GoT.png", category: "主菜"},
+            {name: "麻婆豆腐", price: 28, image: "GoT.png", category: "主菜"},
+            {name: "可乐", price: 5, image: "GoT.png", category: "饮品"},
+            {name: "雪碧", price: 5, image: "GoT.png", category: "饮品"},
             // 添加更多菜品...
         ];
 
         let order = [];
 
         function updateMenu() {
-            const menu = document.getElementById('menu');
-            menu.innerHTML = '';
-            dishes.forEach((dish, index) => {
-                menu.innerHTML += `
+            const categories = [...new Set(dishes.map(dish => dish.category))];
+            const categoryDiv = document.getElementById('categories');
+            categoryDiv.innerHTML = '';
+            categories.forEach(category => {
+                categoryDiv.innerHTML += `<h2>${category}</h2><div class="menu" id="${category}"></div>`;
+            });
+
+            dishes.forEach(dish => {
+                document.getElementById(dish.category).innerHTML += `
                     <div class="dish-card">
                         <img src="${dish.image}" alt="${dish.name}" class="dish-image">
                         <h3>${dish.name}</h3>
                         <p>价格：${dish.price}</p>
-                        <button onclick="addToOrder(${index})">添加到订单</button>
+                        <button onclick="addToOrder(${dishes.indexOf(dish)})">添加到订单</button>
                     </div>
                 `;
             });
@@ -81,7 +88,6 @@
                 orders.push(newOrder);
                 localStorage.setItem('orders', JSON.stringify(orders));
 
-                // 更新销售统计
                 let salesStats = JSON.parse(localStorage.getItem('salesStats')) || {};
                 order.forEach(dish => {
                     if (salesStats[dish.name]) {

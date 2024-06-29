@@ -97,13 +97,10 @@
             const orderElement = document.getElementById(`order-${orderId}`);
             html2canvas(orderElement).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const newWindow = window.open('');
-                newWindow.document.write('<img src="' + imgData + '" />');
-                newWindow.document.close();
-                setTimeout(() => {
-                    newWindow.print();
-                    newWindow.close();
-                }, 500);
+                const link = document.createElement('a');
+                link.href = imgData;
+                link.download = `order-${orderId}.png`;
+                link.click();
             });
         }
 
