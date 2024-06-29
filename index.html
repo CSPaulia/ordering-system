@@ -5,53 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>点餐系统</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .menu { display: flex; flex-wrap: wrap; justify-content: space-around; }
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; display: flex; }
+        #categories { width: 200px; border-right: 1px solid #ddd; padding-right: 20px; }
+        #categories h2 { cursor: pointer; }
+        #menu { flex-grow: 1; display: flex; flex-wrap: wrap; justify-content: space-around; padding-left: 20px; }
         .dish-card { border: 1px solid #ddd; padding: 10px; margin: 10px; width: 200px; text-align: center; }
         .dish-image { width: 180px; height: 180px; object-fit: cover; }
         #order-list { margin-top: 20px; }
-        .category { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>点餐系统</h1>
     <div id="categories">
-        <!-- 菜品分类将在这里动态生成 -->
+        <h2 onclick="showCategory('全部')">全部</h2>
+        <h2 onclick="showCategory('主菜')">主菜</h2>
+        <h2 onclick="showCategory('饮品')">饮品</h2>
+        <!-- 添加更多分类 -->
     </div>
-    <div id="order-list">
-        <h2>您的订单</h2>
-        <!-- 订单列表将在这里动态生成 -->
+    <div>
+        <h1>点餐系统</h1>
+        <div id="menu">
+            <!-- 菜品卡片将在这里动态生成 -->
+        </div>
+        <div id="order-list">
+            <h2>您的订单</h2>
+            <!-- 订单列表将在这里动态生成 -->
+        </div>
+        <button onclick="placeOrder()">提交订单</button>
+        <a href="orders.html">查看所有订单</a>
     </div>
-    <button onclick="placeOrder()">提交订单</button>
-    <a href="orders.html">查看所有订单</a>
 
     <script>
         const dishes = [
             {name: "宫保鸡丁", price: 38, image: "GoT.png", category: "主菜"},
             {name: "鱼香肉丝", price: 32, image: "GoT.png", category: "主菜"},
             {name: "麻婆豆腐", price: 28, image: "GoT.png", category: "主菜"},
-            {name: "可乐", price: 5, image: "GoT.png", category: "饮品"},
-            {name: "雪碧", price: 5, image: "GoT.png", category: "饮品"},
+            {name: "可乐", price: 5, image: "coke.png", category: "饮品"},
+            {name: "雪碧", price: 5, image: "sprite.png", category: "饮品"},
             // 添加更多菜品...
         ];
 
         let order = [];
+        let currentCategory = '全部';
+
+        function showCategory(category) {
+            currentCategory = category;
+            updateMenu();
+        }
 
         function updateMenu() {
-            const categories = [...new Set(dishes.map(dish => dish.category))];
-            const categoryDiv = document.getElementById('categories');
-            categoryDiv.innerHTML = '';
-            categories.forEach(category => {
-                categoryDiv.innerHTML += `<h2>${category}</h2><div class="menu" id="${category}"></div>`;
-            });
-
-            dishes.forEach(dish => {
-                document.getElementById(dish.category).innerHTML += `
+            const menu = document.getElementById('menu');
+            menu.innerHTML = '';
+            const filteredDishes = currentCategory === '全部' ? dishes : dishes.filter(dish => dish.category === currentCategory);
+            filteredDishes.forEach((dish, index) => {
+                menu.innerHTML += `
                     <div class="dish-card">
                         <img src="${dish.image}" alt="${dish.name}" class="dish-image">
                         <h3>${dish.name}</h3>
                         <p>价格：${dish.price}</p>
-                        <button onclick="addToOrder(${dishes.indexOf(dish)})">添加到订单</button>
+                        <button onclick="addToOrder(${index})">添加到订单</button>
                     </div>
                 `;
             });
