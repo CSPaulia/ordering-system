@@ -19,6 +19,7 @@
     <h1>订单管理</h1>
     <div class="control-panel">
         <button onclick="deleteAllOrders()">删除所有订单</button>
+        <button onclick="downloadSalesStats()">下载销售统计</button>
     </div>
     <div id="order-list">
         <!-- 订单列表将在这里动态生成 -->
@@ -118,6 +119,18 @@
                 loadOrders();
                 loadSalesStats();
             }
+        }
+
+        function downloadSalesStats() {
+            const stats = calculateSalesStats();
+            const statsJson = JSON.stringify(stats, null, 2);
+            const blob = new Blob([statsJson], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'sales-stats.json';
+            link.click();
+            URL.revokeObjectURL(url);
         }
 
         // 页面加载时显示订单和销售统计
