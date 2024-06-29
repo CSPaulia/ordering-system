@@ -3,72 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简易点餐系统</title>
+    <title>点餐系统</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
-        #menu, #order { margin-bottom: 20px; }
-        button { margin: 5px; padding: 5px 10px; }
-        input { margin: 5px; padding: 5px; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .menu { display: flex; flex-wrap: wrap; justify-content: space-around; }
+        .dish-card { border: 1px solid #ddd; padding: 10px; margin: 10px; width: 200px; text-align: center; }
+        .dish-image { width: 180px; height: 180px; object-fit: cover; }
+        #order-list { margin-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>简易点餐系统</h1>
-    <div id="menu">
-        <h2>菜单</h2>
-        <input type="text" id="newDish" placeholder="输入新菜品">
-        <button onclick="addDish()">添加菜品</button>
-        <div id="dishList"></div>
+    <h1>点餐系统</h1>
+    <div class="menu" id="menu">
+        <!-- 菜品卡片将在这里动态生成 -->
     </div>
-    <div id="order">
-        <h2>订单</h2>
-        <div id="orderList"></div>
-        <button onclick="placeOrder()">确认订单</button>
+    <div id="order-list">
+        <h2>您的订单</h2>
+        <!-- 订单列表将在这里动态生成 -->
     </div>
+    <button onclick="placeOrder()">提交订单</button>
 
     <script>
-        let menu = [];
+        let dishes = JSON.parse(localStorage.getItem('dishes')) || [];
         let order = [];
 
-        function addDish() {
-            const name = document.getElementById('newDish').value;
-            if (name) {
-                menu.push(name);
-                updateMenu();
-                document.getElementById('newDish').value = '';
-            }
-        }
-
         function updateMenu() {
-            const dishList = document.getElementById('dishList');
-            dishList.innerHTML = '';
-            menu.forEach((dish, index) => {
-                dishList.innerHTML += `<button onclick="addToOrder(${index})">${dish}</button>`;
+            const menu = document.getElementById('menu');
+            menu.innerHTML = '';
+            dishes.forEach((dish, index) => {
+                menu.innerHTML += `
+                    <div class="dish-card">
+                        <img src="${dish.image}" alt="${dish.name}" class="dish-image">
+                        <h3>${dish.name}</h3>
+                        <p>价格：${dish.price}</p>
+                        <button onclick="addToOrder(${index})">添加到订单</button>
+                    </div>
+                `;
             });
         }
 
         function addToOrder(index) {
-            order.push(menu[index]);
-            updateOrder();
+            order.push(dishes[index]);
+            updateOrderList();
         }
 
-        function updateOrder() {
-            const orderList = document.getElementById('orderList');
-            orderList.innerHTML = '';
+        function updateOrderList() {
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = '<h2>您的订单</h2>';
             order.forEach((dish, index) => {
-                orderList.innerHTML += `<p>${dish} <button onclick="removeFromOrder(${index})">删除</button></p>`;
+                orderList.innerHTML += `
+                    <p>${dish.name} - ${dish.price} <button onclick="removeFromOrder(${index})">删除</button></p>
+                `;
             });
         }
 
         function removeFromOrder(index) {
             order.splice(index, 1);
-            updateOrder();
+            updateOrderList();
         }
 
         function placeOrder() {
-            alert('订单已确认！\n选择的菜品：\n' + order.join('\n'));
-            order = [];
-            updateOrder();
+            if (order.length > 0) {
+                let orders = JSON.parse(localStorage.getItem('orders')) || [];
+                orders.push({
+                    id: Date.now(),
+                    items: order,
+                    total: order.reduce((sum, dish) => sum + parseFloat(dish.price), 0)
+                });
+                localStorage.setItem('orders', JSON.stringify(orders));
+                alert('订单已提交！');
+                order = [];
+                updateOrderList();
+            } else {
+                alert('请先添加菜品到订单！');
+            }
         }
+
+        updateMenu();
     </script>
 </body>
 </html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>菜品管理</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .dish-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+        input, button { margin: 5px; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>菜品管理</h1>
+    <div id="add-dish">
+        <h2>添加新菜品</h2>
+        <input type="text" id="dish-name" placeholder="菜品名称">
+        <input type="text" id="dish-price" placeholder="价格">
+        <input type="text" id="dish-image" placeholder="图片URL">
+        <button onclick="addDish()">添加菜品</button>
+    </div>
+    <div id="dish-list">
+        <h2>现有菜品</h2>
+        <!-- 菜品列表将在这里动态生成 -->
+    </div>
+
+    <script>
+        let dishes = JSON.parse(localStorage.getItem('dishes')) || [];
+
+        function addDish() {
+            const name = document.getElementById('dish-name').value;
+            const price = document.getElementById('dish-price').value;
+            const image = document.getElementById('dish-image').value;
+            if (name && price && image) {
+                dishes.push({name, price, image});
+                localStorage.setItem('dishes', JSON.stringify(dishes));
+                updateDishList();
+                document.getElementById('dish-name').value = '';
+                document.getElementById('dish-price').value = '';
+                document.getElementById('dish-image').value = '';
+            }
+        }
+
+        function updateDishList() {
+            const dishList = document.getElementById('dish-list');
+            dishList.innerHTML = '<h2>现有菜品</h2>';
+            dishes.forEach((dish, index) => {
+                dishList.innerHTML += `
+                    <div class="dish-item">
+                        <p>名称：${dish.name}</p>
+                        <p>价格：${dish.price}</p>
+                        <p>图片URL：${dish.image}</p>
+                        <button onclick="removeDish(${index})">删除</button>
+                    </div>
+                `;
+            });
+        }
+
+        function removeDish(index) {
+            dishes.splice(index, 1);
+            localStorage.setItem('dishes', JSON.stringify(dishes));
+            updateDishList();
+        }
+
+        updateDishList();
+    </script>
+</body>
+</html>
