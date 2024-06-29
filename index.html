@@ -20,17 +20,21 @@
         <h2 onclick="showCategory('主菜')">主菜</h2>
         <h2 onclick="showCategory('饮品')">饮品</h2>
         <!-- 添加更多分类 -->
+        
+        <!-- 显示订单 -->
+        <div id="order-section">
+            <h2>您的订单</h2>
+            <div id="order-list">
+                <!-- 订单列表将在这里动态生成 -->
+            </div>
+            <button onclick="placeOrder(); checkLocalStorageSize();">提交订单</button>
+        </div>
     </div>
     <div>
-        <h1>点餐系统</h1>
+        <h1>很兰吃饱餐厅</h1>
         <div id="menu">
             <!-- 菜品卡片将在这里动态生成 -->
         </div>
-        <div id="order-list">
-            <h2>您的订单</h2>
-            <!-- 订单列表将在这里动态生成 -->
-        </div>
-        <button onclick="placeOrder();checkLocalStorageSize();">提交订单</button>
         <a href="orders.html">查看所有订单</a>
     </div>
 
@@ -75,7 +79,7 @@
 
         function updateOrderList() {
             const orderList = document.getElementById('order-list');
-            orderList.innerHTML = '<h2>您的订单</h2>';
+            orderList.innerHTML = '';
             order.forEach((dish, index) => {
                 orderList.innerHTML += `
                     <p>${dish.name} - ${dish.price} <button onclick="removeFromOrder(${index})">删除</button></p>
@@ -126,7 +130,6 @@
             }
             console.log(`LocalStorage Size: ${size} bytes`);
         }
-
 
         updateMenu();
     </script>
