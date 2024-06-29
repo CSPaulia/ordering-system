@@ -11,7 +11,8 @@
         #menu { flex-grow: 1; display: flex; flex-wrap: wrap; justify-content: space-around; padding-left: 20px; }
         .dish-card { border: 1px solid #ddd; padding: 10px; margin: 10px; width: 200px; text-align: center; }
         .dish-image { width: 180px; height: 180px; object-fit: cover; }
-        #order-list { margin-top: 20px; }
+        #order-section { width: 300px; padding-left: 20px; }
+        .order-item { margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -20,22 +21,19 @@
         <h2 onclick="showCategory('主菜')">主菜</h2>
         <h2 onclick="showCategory('饮品')">饮品</h2>
         <!-- 添加更多分类 -->
-        
-        <!-- 显示订单 -->
-        <div id="order-section">
-            <h2>您的订单</h2>
-            <div id="order-list">
-                <!-- 订单列表将在这里动态生成 -->
-            </div>
-            <button onclick="placeOrder(); checkLocalStorageSize();">提交订单</button>
-        </div>
     </div>
     <div>
         <h1>很兰吃饱餐厅</h1>
         <div id="menu">
             <!-- 菜品卡片将在这里动态生成 -->
         </div>
-        <a href="orders.html">查看所有订单</a>
+    </div>
+    <div id="order-section">
+        <h2>您的订单</h2>
+        <div id="order-list">
+            <!-- 订单列表将在这里动态生成 -->
+        </div>
+        <button onclick="placeOrder()">提交订单</button>
     </div>
 
     <script>
@@ -119,16 +117,6 @@
             } else {
                 alert('请先添加菜品到订单！');
             }
-        }
-
-        function checkLocalStorageSize() {
-            let size = 0;
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    size += localStorage.getItem(key).length;
-                }
-            }
-            console.log(`LocalStorage Size: ${size} bytes`);
         }
 
         updateMenu();
