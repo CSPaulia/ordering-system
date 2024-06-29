@@ -22,9 +22,17 @@
         <!-- 订单列表将在这里动态生成 -->
     </div>
     <button onclick="placeOrder()">提交订单</button>
+    <a href="orders.html">查看所有订单</a>
 
     <script>
-        let dishes = JSON.parse(localStorage.getItem('dishes')) || [];
+        // 直接在代码中定义菜品
+        const dishes = [
+            {name: "宫保鸡丁", price: 38, image: "GoT.png"},
+            {name: "鱼香肉丝", price: 32, image: "GoT.png"},
+            {name: "麻婆豆腐", price: 28, image: "GoT.png"},
+            // 添加更多菜品...
+        ];
+
         let order = [];
 
         function updateMenu() {
@@ -65,12 +73,25 @@
         function placeOrder() {
             if (order.length > 0) {
                 let orders = JSON.parse(localStorage.getItem('orders')) || [];
-                orders.push({
+                const newOrder = {
                     id: Date.now(),
                     items: order,
                     total: order.reduce((sum, dish) => sum + parseFloat(dish.price), 0)
-                });
+                };
+                orders.push(newOrder);
                 localStorage.setItem('orders', JSON.stringify(orders));
+
+                // 更新销售统计
+                let salesStats = JSON.parse(localStorage.getItem('salesStats')) || {};
+                order.forEach(dish => {
+                    if (salesStats[dish.name]) {
+                        salesStats[dish.name]++;
+                    } else {
+                        salesStats[dish.name] = 1;
+                    }
+                });
+                localStorage.setItem('salesStats', JSON.stringify(salesStats));
+
                 alert('订单已提交！');
                 order = [];
                 updateOrderList();
@@ -83,7 +104,3 @@
     </script>
 </body>
 </html>
-<div style="margin-top: 20px;">
-    <a href="admin.html">管理菜品</a> | 
-    <a href="orders.html">查看订单</a>
-</div>

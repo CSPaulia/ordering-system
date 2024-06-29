@@ -8,13 +8,19 @@
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         .order-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
         .dish-list { margin-left: 20px; }
+        #sales-stats { margin-top: 20px; }
     </style>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <a href="index.html">返回主页</a>
     <h1>订单管理</h1>
     <div id="order-list">
         <!-- 订单列表将在这里动态生成 -->
+    </div>
+    <div id="sales-stats">
+        <h2>销售统计</h2>
+        <!-- 销售统计将在这里动态生成 -->
     </div>
 
     <script>
@@ -27,9 +33,10 @@
                 return;
             }
 
+            orderList.innerHTML = '';
             orders.forEach((order, index) => {
                 let orderHtml = `
-                    <div class="order-item">
+                    <div class="order-item" id="order-${order.id}">
                         <h3>订单 #${order.id}</h3>
                         <p>总价: ¥${order.total.toFixed(2)}</p>
                         <h4>点餐详情:</h4>
@@ -42,7 +49,7 @@
 
                 orderHtml += `
                         </ul>
-                        <button onclick="deleteOrder(${index})">删除订单</button>
+                        <button onclick="printOrder(${order.id})">打印小票</button>
                     </div>
                 `;
 
@@ -50,15 +57,36 @@
             });
         }
 
-        function deleteOrder(index) {
-            let orders = JSON.parse(localStorage.getItem('orders')) || [];
-            orders.splice(index, 1);
-            localStorage.setItem('orders', JSON.stringify(orders));
-            location.reload(); // 刷新页面以更新订单列表
+        function loadSalesStats() {
+            const statsDiv = document.getElementById('sales-stats');
+            const stats = JSON.parse(localStorage.getItem('salesStats')) || {};
+
+            let statsHtml = '<h2>销售统计</h2><ul>';
+            for (let dish in stats) {
+                statsHtml += `<li>${dish}: 售出 ${stats[dish]} 份</li>`;
+            }
+            statsHtml += '</ul>';
+
+            statsDiv.innerHTML = statsHtml;
         }
 
-        // 页面加载时显示订单
+        function printOrder(orderId) {
+            const orderElement = document.getElementById(`order-${orderId}`);
+            html2canvas(orderElement).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const newWindow = window.open('');
+                newWindow.document.write('<img src="' + imgData + '" />');
+                newWindow.document.close();
+                setTimeout(() => {
+                    newWindow.print();
+                    newWindow.close();
+                }, 500);
+            });
+        }
+
+        // 页面加载时显示订单和销售统计
         loadOrders();
+        loadSalesStats();
     </script>
 </body>
 </html>
