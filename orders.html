@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zh">
-<a href="index.html">返回主页</a>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +7,58 @@
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
         .order-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+        .dish-list { margin-left: 20px; }
     </style>
 </head>
 <body>
+    <a href="index.html">返回主页</a>
     <h1>订单管理</h1>
     <div id="order-list">
         <!-- 订单列表将在这里动态生成 -->
     </div>
+
+    <script>
+        function loadOrders() {
+            const orderList = document.getElementById('order-list');
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+            if (orders.length === 0) {
+                orderList.innerHTML = '<p>暂无订单</p>';
+                return;
+            }
+
+            orders.forEach((order, index) => {
+                let orderHtml = `
+                    <div class="order-item">
+                        <h3>订单 #${order.id}</h3>
+                        <p>总价: ¥${order.total.toFixed(2)}</p>
+                        <h4>点餐详情:</h4>
+                        <ul class="dish-list">
+                `;
+
+                order.items.forEach(item => {
+                    orderHtml += `<li>${item.name} - ¥${item.price}</li>`;
+                });
+
+                orderHtml += `
+                        </ul>
+                        <button onclick="deleteOrder(${index})">删除订单</button>
+                    </div>
+                `;
+
+                orderList.innerHTML += orderHtml;
+            });
+        }
+
+        function deleteOrder(index) {
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.splice(index, 1);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            location.reload(); // 刷新页面以更新订单列表
+        }
+
+        // 页面加载时显示订单
+        loadOrders();
+    </script>
+</body>
+</html>
