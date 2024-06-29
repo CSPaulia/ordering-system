@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简易点餐系统</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        #menu, #order { margin-bottom: 20px; }
+        button { margin: 5px; padding: 5px 10px; }
+        input { margin: 5px; padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>简易点餐系统</h1>
+    <div id="menu">
+        <h2>菜单</h2>
+        <input type="text" id="newDish" placeholder="输入新菜品">
+        <button onclick="addDish()">添加菜品</button>
+        <div id="dishList"></div>
+    </div>
+    <div id="order">
+        <h2>订单</h2>
+        <div id="orderList"></div>
+        <button onclick="placeOrder()">确认订单</button>
+    </div>
+
+    <script>
+        let menu = [];
+        let order = [];
+
+        function addDish() {
+            const name = document.getElementById('newDish').value;
+            if (name) {
+                menu.push(name);
+                updateMenu();
+                document.getElementById('newDish').value = '';
+            }
+        }
+
+        function updateMenu() {
+            const dishList = document.getElementById('dishList');
+            dishList.innerHTML = '';
+            menu.forEach((dish, index) => {
+                dishList.innerHTML += `<button onclick="addToOrder(${index})">${dish}</button>`;
+            });
+        }
+
+        function addToOrder(index) {
+            order.push(menu[index]);
+            updateOrder();
+        }
+
+        function updateOrder() {
+            const orderList = document.getElementById('orderList');
+            orderList.innerHTML = '';
+            order.forEach((dish, index) => {
+                orderList.innerHTML += `<p>${dish} <button onclick="removeFromOrder(${index})">删除</button></p>`;
+            });
+        }
+
+        function removeFromOrder(index) {
+            order.splice(index, 1);
+            updateOrder();
+        }
+
+        function placeOrder() {
+            alert('订单已确认！\n选择的菜品：\n' + order.join('\n'));
+            order = [];
+            updateOrder();
+        }
+    </script>
+</body>
+</html>
