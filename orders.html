@@ -9,12 +9,17 @@
         .order-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
         .dish-list { margin-left: 20px; }
         #sales-stats { margin-top: 20px; }
+        .control-panel { margin-bottom: 20px; }
+        .control-panel button { margin-right: 10px; }
     </style>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <a href="index.html">返回主页</a>
     <h1>订单管理</h1>
+    <div class="control-panel">
+        <button onclick="deleteAllOrders()">删除所有订单</button>
+    </div>
     <div id="order-list">
         <!-- 订单列表将在这里动态生成 -->
     </div>
@@ -50,6 +55,7 @@
                 orderHtml += `
                         </ul>
                         <button onclick="printOrder(${order.id})">打印小票</button>
+                        <button onclick="deleteOrder(${index})">删除订单</button>
                     </div>
                 `;
 
@@ -59,7 +65,7 @@
 
         function loadSalesStats() {
             const statsDiv = document.getElementById('sales-stats');
-            const stats = JSON.parse(localStorage.getItem('salesStats')) || {};
+            const stats = calculateSalesStats();
 
             let statsHtml = '<h2>销售统计</h2><ul>';
             for (let dish in stats) {
@@ -68,6 +74,23 @@
             statsHtml += '</ul>';
 
             statsDiv.innerHTML = statsHtml;
+        }
+
+        function calculateSalesStats() {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            let stats = {};
+
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    if (stats[item.name]) {
+                        stats[item.name]++;
+                    } else {
+                        stats[item.name] = 1;
+                    }
+                });
+            });
+
+            return stats;
         }
 
         function printOrder(orderId) {
@@ -82,6 +105,22 @@
                     newWindow.close();
                 }, 500);
             });
+        }
+
+        function deleteOrder(index) {
+            let orders = JSON.parse(localStorage.getItem('orders')) || [];
+            orders.splice(index, 1);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            loadOrders();
+            loadSalesStats();
+        }
+
+        function deleteAllOrders() {
+            if (confirm('确定要删除所有订单吗？')) {
+                localStorage.removeItem('orders');
+                loadOrders();
+                loadSalesStats();
+            }
         }
 
         // 页面加载时显示订单和销售统计
